@@ -3,7 +3,7 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="FlexiTableApp/ViewController.cs">
     <Files>
       <File FileName="FlexiTableApp/AppDelegate.cs" Line="25" Column="4" />
-      <File FileName="FlexiTableApp/ViewController.cs" Line="19" Column="48" />
+      <File FileName="FlexiTableApp/ViewController.cs" Line="71" Column="29" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" />
