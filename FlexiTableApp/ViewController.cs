@@ -14,11 +14,11 @@ namespace FlexiTableApp
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad();
-			// Perform any additional setup after loading the view, typically from a nib.
+
+			View.BackgroundColor = UIColor.Blue;
 
 			headerView.BackgroundColor = UIColor.Orange;
 			headerView.Layer.ZPosition = 1;
-			//headerView.Layer.AnchorPoint = new CoreGraphics.CGPoint(0.5, 0);
 
 			string[] tableItems = new string[] { "Vegetables", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers" };
 			tableView.Source = new TableSource(tableItems, headerHeightConstraint, headerView);
@@ -70,34 +70,33 @@ namespace FlexiTableApp
 		public override void Scrolled(UIScrollView scrollView)
 		{
 			var offset = scrollView.ContentOffset.Y;
-			var headerTransform = CATransform3D.Identity;
+			var headerScaleFactor = -(offset) / baseHeight;
 
-			//var height = baseHeight - offset;
-			//if (height < 60f)
-			//	height = 60f;
+			nfloat targetHeight = baseHeight * (1 + headerScaleFactor);
 
 			// Pull Down
 			if (offset < 0)
 			{
-				nfloat headerScaleFactor = -(offset) / header.Bounds.Height;
-				nfloat headerSizevariation = ((header.Bounds.Height * (1.0f + headerScaleFactor)) - header.Bounds.Height) / 2.0f;
-
-				headerTransform = headerTransform.Translate(0f, headerSizevariation, 0f);
-				headerTransform = headerTransform.Scale(1.0f + headerScaleFactor, 1.0f + headerScaleFactor, 0f);
-
-				header.Layer.Transform = headerTransform;
+				// TODO Specific pull down logic
+				if (targetHeight > 300f)
+					targetHeight = 300f;
 			}
 
 			// Scroll up / down
 			else
 			{
-				// Header
-				headerTransform = headerTransform.Translate(0, (nfloat)Math.Max(-60f, -offset), 0);
-				header.Layer.Transform = headerTransform;
-				headerHeight.Constant = header.Layer.Frame.Height;
+				// TODO Specific scroll logic
 
-				Console.WriteLine("Layer bounds {0}", header.Layer.Bounds);
+				if (targetHeight < 60f)
+					targetHeight = 60f;
 			}
- 		}
+
+			var frame = header.Frame;
+			frame.Height = targetHeight;
+			header.Frame = frame;
+
+			//headerHeight.Constant = targetHeight;
+			//Console.WriteLine("Layer bounds {0}", header.Layer.Bounds);
+		}
 	}
 }
