@@ -18,9 +18,9 @@ namespace FlexiTableApp
 		{
 			base.ViewDidLoad();
 
-			headerView.BackgroundColor = UIColor.Orange;
-			headerView.Layer.ZPosition = 1;
-			headerView.AddGestureRecognizer(new CustomPanGesture(headerView, tableView));
+			var header = headerView as ScrollHeaderView;
+			header.BackgroundColor = UIColor.Orange;
+			header.Layer.ZPosition = 1;
 
 			tableTopConstraint.Constant = minHeight;
 
@@ -35,51 +35,6 @@ namespace FlexiTableApp
 		{
 			base.DidReceiveMemoryWarning();
 			// Release any cached data, images, etc that aren't in use.
-		}
-	}
-
-
-	public class CustomPanGesture:UIGestureRecognizer
-	{
-		UITableView tableView;
-		UIView targetView;
-
-		public CustomPanGesture(UIView view, UITableView table)
-		{
-			targetView = view;
-			tableView = table;
-		}
-
-		public override void TouchesBegan(Foundation.NSSet touches, UIEvent evt)
-		{
-			base.TouchesBegan(touches, evt);
-
-			if (touches.Count != 1)
-				TouchesCancelled(touches, evt);
-		}
-
-		public override void TouchesMoved(Foundation.NSSet touches, UIEvent evt)
-		{
-			base.TouchesMoved(touches, evt);
-
-			var touch = touches.AnyObject as UITouch;
-			var location = touch.LocationInView(targetView);
-			var prevLocation = touch.PreviousLocationInView(targetView);
-
-			tableView.ContentOffset = new CGPoint(0, tableView.ContentOffset.Y - (location.Y - prevLocation.Y));
-		}
-
-		public override void TouchesEnded(Foundation.NSSet touches, UIEvent evt)
-		{
-			base.TouchesEnded(touches, evt);
-
-			// Reset the table to its original position 
-			//tableView.SetContentOffset(new CGPoint(0, -offset), true);
-		}
-
-		public override void TouchesCancelled(Foundation.NSSet touches, UIEvent evt)
-		{
-			base.TouchesCancelled(touches, evt);
 		}
 	}
 
