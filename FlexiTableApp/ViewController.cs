@@ -6,6 +6,8 @@ namespace FlexiTableApp
 {
 	public partial class ViewController : UIViewController
 	{
+		nfloat minHeight = 60f;
+
 		protected ViewController(IntPtr handle) : base(handle)
 		{
 			// Note: this .ctor should not contain any initialization logic.
@@ -15,13 +17,14 @@ namespace FlexiTableApp
 		{
 			base.ViewDidLoad();
 
-			View.BackgroundColor = UIColor.Blue;
-
 			headerView.BackgroundColor = UIColor.Orange;
 			headerView.Layer.ZPosition = 1;
 
-			string[] tableItems = new string[] { "Vegetables", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers" };
-			tableView.Source = new TableSource(tableItems, headerHeightConstraint, headerView);
+			string[] tableItems = new string[] { "First", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers","Fruits", "Flower Buds", "Legumes", "Fruits", "Flower Buds", "Legumes", "Vegetables", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers", "Fruits", "Flower Buds", "Legumes", "Fruits", "Flower Buds", "Legumes" };
+			tableView.Source = new TableSource(tableItems, headerHeightConstraint, minHeight);
+
+			//var offset = headerHeightConstraint.Constant - tableView.Frame.Y;
+			tableView.ContentInset = new UIEdgeInsets(minHeight, 0, 0, 0);
 		}
 
 		public override void DidReceiveMemoryWarning()
@@ -36,16 +39,17 @@ namespace FlexiTableApp
 
 		string[] TableItems;
 		string CellIdentifier = "TableCell";
+
 		NSLayoutConstraint headerHeight;
 		nfloat baseHeight;
-		UIView header;
+		nfloat minHeight;
 
-		public TableSource(string[] items, NSLayoutConstraint headerHeight, UIView header)
+		public TableSource(string[] items, NSLayoutConstraint headerHeight, nfloat minHeight)
 		{
 			TableItems = items;
 			this.headerHeight = headerHeight;
+			this.minHeight = minHeight;
 			baseHeight = headerHeight.Constant;
-			this.header = header;
 		}
 
 		public override nint RowsInSection(UITableView tableview, nint section)
@@ -69,17 +73,17 @@ namespace FlexiTableApp
 
 		public override void Scrolled(UIScrollView scrollView)
 		{
-			var offset = scrollView.ContentOffset.Y;
+			var offset = (scrollView.ContentOffset.Y + minHeight);
 			var headerScaleFactor = -(offset) / baseHeight;
-
-			nfloat targetHeight = baseHeight * (1 + headerScaleFactor);
+			var targetHeight = baseHeight * (1 + headerScaleFactor);
 
 			// Pull Down
 			if (offset < 0)
 			{
 				// TODO Specific pull down logic
-				if (targetHeight > 300f)
+				if (targetHeight > 300f){
 					targetHeight = 300f;
+				}
 			}
 
 			// Scroll up / down
@@ -87,16 +91,11 @@ namespace FlexiTableApp
 			{
 				// TODO Specific scroll logic
 
-				if (targetHeight < 60f)
-					targetHeight = 60f;
+				if (targetHeight < minHeight)
+					targetHeight = minHeight;
 			}
 
-			var frame = header.Frame;
-			frame.Height = targetHeight;
-			header.Frame = frame;
-
-			//headerHeight.Constant = targetHeight;
-			//Console.WriteLine("Layer bounds {0}", header.Layer.Bounds);
+			headerHeight.Constant = targetHeight;
 		}
 	}
 }
