@@ -47,6 +47,7 @@
                     <connections>
                         <outlet property="headerHeightConstraint" destination="wSh-eE-lPP" id="uSG-m5-wOa"/>
                         <outlet property="headerView" destination="gil-aL-JRP" id="DGb-MX-raW"/>
+                        <outlet property="tableTopConstraint" destination="wbk-MN-QLd" id="YiG-I4-w4n"/>
                         <outlet property="tableView" destination="okH-3f-oY7" id="sUx-kn-CBp"/>
                     </connections>
                 </viewController>

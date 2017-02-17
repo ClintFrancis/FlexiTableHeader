@@ -1,12 +1,13 @@
 ﻿using System;
 using CoreAnimation;
+using CoreGraphics;
 using UIKit;
 
 namespace FlexiTableApp
 {
 	public partial class ViewController : UIViewController
 	{
-		nfloat minHeight = 60f;
+		nfloat minHeight = 20f;
 
 		protected ViewController(IntPtr handle) : base(handle)
 		{
@@ -19,12 +20,15 @@ namespace FlexiTableApp
 
 			headerView.BackgroundColor = UIColor.Orange;
 			headerView.Layer.ZPosition = 1;
+			headerView.AddGestureRecognizer(new CustomPanGesture(headerView, tableView));
 
-			string[] tableItems = new string[] { "First", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers","Fruits", "Flower Buds", "Legumes", "Fruits", "Flower Buds", "Legumes", "Vegetables", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers", "Fruits", "Flower Buds", "Legumes", "Fruits", "Flower Buds", "Legumes" };
+			tableTopConstraint.Constant = minHeight;
+
+			var tableItems = new string[] { "First", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers","Fruits", "Flower Buds", "Legumes", "Fruits", "Flower Buds", "Legumes", "Vegetables", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers", "Fruits", "Flower Buds", "Legumes", "Fruits", "Flower Buds", "Legumes" };
 			tableView.Source = new TableSource(tableItems, headerHeightConstraint, minHeight);
 
-			//var offset = headerHeightConstraint.Constant - tableView.Frame.Y;
-			tableView.ContentInset = new UIEdgeInsets(minHeight, 0, 0, 0);
+			var offset = headerHeightConstraint.Constant - tableTopConstraint.Constant;
+			tableView.ContentInset = new UIEdgeInsets(offset, 0, 0, 0);
 		}
 
 		public override void DidReceiveMemoryWarning()
@@ -34,9 +38,53 @@ namespace FlexiTableApp
 		}
 	}
 
+
+	public class CustomPanGesture:UIGestureRecognizer
+	{
+		UITableView tableView;
+		UIView targetView;
+
+		public CustomPanGesture(UIView view, UITableView table)
+		{
+			targetView = view;
+			tableView = table;
+		}
+
+		public override void TouchesBegan(Foundation.NSSet touches, UIEvent evt)
+		{
+			base.TouchesBegan(touches, evt);
+
+			if (touches.Count != 1)
+				TouchesCancelled(touches, evt);
+		}
+
+		public override void TouchesMoved(Foundation.NSSet touches, UIEvent evt)
+		{
+			base.TouchesMoved(touches, evt);
+
+			var touch = touches.AnyObject as UITouch;
+			var location = touch.LocationInView(targetView);
+			var prevLocation = touch.PreviousLocationInView(targetView);
+
+			tableView.ContentOffset = new CGPoint(0, tableView.ContentOffset.Y - (location.Y - prevLocation.Y));
+		}
+
+		public override void TouchesEnded(Foundation.NSSet touches, UIEvent evt)
+		{
+			base.TouchesEnded(touches, evt);
+
+			// Reset the table to its original position 
+			//tableView.SetContentOffset(new CGPoint(0, -offset), true);
+		}
+
+		public override void TouchesCancelled(Foundation.NSSet touches, UIEvent evt)
+		{
+			base.TouchesCancelled(touches, evt);
+		}
+	}
+
 	public class TableSource : UITableViewSource
 	{
-
 		string[] TableItems;
 		string CellIdentifier = "TableCell";
 
@@ -73,7 +121,7 @@ namespace FlexiTableApp
 
 		public override void Scrolled(UIScrollView scrollView)
 		{
-			var offset = (scrollView.ContentOffset.Y + minHeight);
+			var offset = scrollView.ContentOffset.Y + (baseHeight - minHeight);
 			var headerScaleFactor = -(offset) / baseHeight;
 			var targetHeight = baseHeight * (1 + headerScaleFactor);
 

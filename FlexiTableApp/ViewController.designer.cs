@@ -19,10 +19,23 @@ namespace FlexiTableApp
 		UIKit.UIView headerView { get; set; }
 
 		[Outlet]
+		UIKit.NSLayoutConstraint tableTopConstraint { get; set; }
+
+		[Outlet]
 		UIKit.UITableView tableView { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (headerHeightConstraint != null) {
+				headerHeightConstraint.Dispose ();
+				headerHeightConstraint = null;
+			}
+
+			if (tableTopConstraint != null) {
+				tableTopConstraint.Dispose ();
+				tableTopConstraint = null;
+			}
+
 			if (headerView != null) {
 				headerView.Dispose ();
 				headerView = null;
@@ -31,11 +44,6 @@ namespace FlexiTableApp
 			if (tableView != null) {
 				tableView.Dispose ();
 				tableView = null;
-			}
-
-			if (headerHeightConstraint != null) {
-				headerHeightConstraint.Dispose ();
-				headerHeightConstraint = null;
 			}
 		}
 	}
