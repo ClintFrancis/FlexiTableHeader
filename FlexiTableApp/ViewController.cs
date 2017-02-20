@@ -46,6 +46,7 @@ namespace FlexiTableApp
 		NSLayoutConstraint headerHeight;
 		nfloat baseHeight;
 		nfloat minHeight;
+		UIEdgeInsets scrollBarInsets;
 
 		public TableSource(string[] items, NSLayoutConstraint headerHeight, nfloat minHeight)
 		{
@@ -77,8 +78,16 @@ namespace FlexiTableApp
 		public override void Scrolled(UIScrollView scrollView)
 		{
 			var offset = scrollView.ContentOffset.Y + (baseHeight - minHeight);
-			var headerScaleFactor = -(offset) / baseHeight;
+			var headerScaleFactor = -(offset) / baseHeight; 
 			var targetHeight = baseHeight * (1 + headerScaleFactor);
+
+			// Scrollbar offset
+			scrollBarInsets = scrollView.ScrollIndicatorInsets;
+			scrollBarInsets.Top = (offset < 0) ? 
+				scrollBarInsets.Top = -scrollView.ContentOffset.Y :
+				scrollBarInsets.Top = -scrollView.ContentOffset.Y + minHeight;
+
+			scrollView.ScrollIndicatorInsets = scrollBarInsets;
 
 			// Pull Down
 			if (offset < 0)
