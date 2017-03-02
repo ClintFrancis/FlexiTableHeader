@@ -119,6 +119,7 @@
       <DependentUpon>ScrollHeaderView.cs</DependentUpon>
     </Compile>
     <Compile Include="CustomPanGesture.cs" />
+    <Compile Include="FlexiTableHeaderSource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

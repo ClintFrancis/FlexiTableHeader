@@ -25,7 +25,7 @@ namespace FlexiTableApp
 			tableTopConstraint.Constant = minHeight;
 
 			var tableItems = new string[] { "First", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers","Fruits", "Flower Buds", "Legumes", "Fruits", "Flower Buds", "Legumes", "Vegetables", "Fruits", "Flower Buds", "Legumes", "Bulbs", "Tubers", "Fruits", "Flower Buds", "Legumes", "Fruits", "Flower Buds", "Legumes" };
-			tableView.Source = new TableSource(tableItems, headerHeightConstraint, minHeight);
+			tableView.Source = new DemoTableSource(tableItems, this, tableView, headerHeightConstraint, minHeight);
 
 			var offset = headerHeightConstraint.Constant - tableTopConstraint.Constant;
 			tableView.ContentInset = new UIEdgeInsets(offset, 0, 0, 0);
@@ -38,27 +38,34 @@ namespace FlexiTableApp
 		}
 	}
 
-	public class TableSource : UITableViewSource
+	public class DemoTableSource:FlexiTableHeaderSource
 	{
 		string[] TableItems;
 		string CellIdentifier = "TableCell";
 
-		NSLayoutConstraint headerHeight;
-		nfloat baseHeight;
-		nfloat minHeight;
-		UIEdgeInsets scrollBarInsets;
-
-		public TableSource(string[] items, NSLayoutConstraint headerHeight, nfloat minHeight)
+		public DemoTableSource(string[] items, UIViewController viewController, UITableView tableView, NSLayoutConstraint heightConstraint, nfloat minHeight):base(viewController,tableView,heightConstraint,minHeight)
 		{
 			TableItems = items;
-			this.headerHeight = headerHeight;
-			this.minHeight = minHeight;
-			baseHeight = headerHeight.Constant;
 		}
 
-		public override nint RowsInSection(UITableView tableview, nint section)
+		// Implement your own height based logic
+		protected override nfloat UpdateTargetHeight(nfloat targetHeight)
 		{
-			return TableItems.Length;
+			// Pull Down
+			if (Offset < 0)
+			{
+				// TODO Specific pull down logic
+			}
+
+			// Scroll up / down
+			else
+			{
+				// TODO Specific scroll logic
+				if (targetHeight < minHeight)
+					targetHeight = minHeight;
+			}
+
+			return targetHeight;
 		}
 
 		public override UITableViewCell GetCell(UITableView tableView, Foundation.NSIndexPath indexPath)
@@ -75,39 +82,9 @@ namespace FlexiTableApp
 			return cell;
 		}
 
-		public override void Scrolled(UIScrollView scrollView)
+		public override nint RowsInSection(UITableView tableview, nint section)
 		{
-			var offset = scrollView.ContentOffset.Y + (baseHeight - minHeight);
-			var headerScaleFactor = -(offset) / baseHeight; 
-			var targetHeight = baseHeight * (1 + headerScaleFactor);
-
-			// Scrollbar offset
-			scrollBarInsets = scrollView.ScrollIndicatorInsets;
-			scrollBarInsets.Top = (offset < 0) ? 
-				scrollBarInsets.Top = -scrollView.ContentOffset.Y :
-				scrollBarInsets.Top = -scrollView.ContentOffset.Y + minHeight;
-
-			scrollView.ScrollIndicatorInsets = scrollBarInsets;
-
-			// Pull Down
-			if (offset < 0)
-			{
-				// TODO Specific pull down logic
-				if (targetHeight > 300f){
-					targetHeight = 300f;
-				}
-			}
-
-			// Scroll up / down
-			else
-			{
-				// TODO Specific scroll logic
-
-				if (targetHeight < minHeight)
-					targetHeight = minHeight;
-			}
-
-			headerHeight.Constant = targetHeight;
+			return TableItems.Length;
 		}
 	}
 }
