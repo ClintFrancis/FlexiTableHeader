@@ -20,7 +20,6 @@ namespace FlexiTableApp
 			this.heightConstraint = heightConstraint;
 			this.minHeight = minHeight;
 			this.baseHeight = heightConstraint.Constant;
-			this.updateHeightAction = updateHeightAction ?? UpdateTargetHeight;
 		}
 
 		[Export("scrollViewDidScroll:")]
@@ -39,7 +38,7 @@ namespace FlexiTableApp
 			scrollView.ScrollIndicatorInsets = scrollBarInsets;
 
 			// Set the height
-			heightConstraint.Constant = updateHeightAction(targetHeight);
+			heightConstraint.Constant = UpdateTargetHeight(targetHeight);
 		}
 
 		protected virtual nfloat UpdateTargetHeight(nfloat targetHeight)
