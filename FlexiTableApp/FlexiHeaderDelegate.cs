@@ -4,9 +4,10 @@ using UIKit;
 
 namespace FlexiTableApp
 {
-	public class FlexiTableHeaderSource:UITableViewSource
+	public class FlexiHeaderDelegate : NSObject, IUITableViewDelegate
 	{
-		protected UIViewController executingController;
+		Func<nfloat, nfloat> updateHeightAction;
+
 		protected NSLayoutConstraint heightConstraint;
 		protected nfloat minHeight;
 		protected nfloat baseHeight;
@@ -14,15 +15,16 @@ namespace FlexiTableApp
 
 		public nfloat Offset { get; private set; }
 
-		public FlexiTableHeaderSource(UIViewController viewController, UITableView tableView, NSLayoutConstraint heightConstraint, nfloat minHeight)
+		public FlexiHeaderDelegate(NSLayoutConstraint heightConstraint, nfloat minHeight)
 		{
-			executingController = viewController;
 			this.heightConstraint = heightConstraint;
 			this.minHeight = minHeight;
-			baseHeight = heightConstraint.Constant;
+			this.baseHeight = heightConstraint.Constant;
+			this.updateHeightAction = updateHeightAction ?? UpdateTargetHeight;
 		}
 
-		public override void Scrolled(UIScrollView scrollView)
+		[Export("scrollViewDidScroll:")]
+		public void Scrolled(UIScrollView scrollView)
 		{
 			Offset = scrollView.ContentOffset.Y + (baseHeight - minHeight);
 			var headerScaleFactor = -(Offset) / baseHeight;
@@ -37,11 +39,17 @@ namespace FlexiTableApp
 			scrollView.ScrollIndicatorInsets = scrollBarInsets;
 
 			// Set the height
-			heightConstraint.Constant = UpdateTargetHeight(targetHeight);
+			heightConstraint.Constant = updateHeightAction(targetHeight);
 		}
 
 		protected virtual nfloat UpdateTargetHeight(nfloat targetHeight)
 		{
+			// Pull Down
+			if (Offset > 0 && targetHeight < minHeight)
+			{
+				targetHeight = minHeight;
+			}
+
 			return targetHeight;
 		}
 
@@ -49,20 +57,11 @@ namespace FlexiTableApp
 		{
 			if (disposing)
 			{
-				executingController = null;
+				heightConstraint = null;
+				updateHeightAction = null;
 			}
 
 			base.Dispose(disposing);
-		}
-
-		public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override nint RowsInSection(UITableView tableview, nint section)
-		{
-			throw new NotImplementedException();
 		}
 	}
 }
